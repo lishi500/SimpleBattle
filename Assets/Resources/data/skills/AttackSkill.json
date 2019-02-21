@@ -1,0 +1,1 @@
+{"config":{"skillName":"AttackSkill","displayName":"AttackSkill","skillActionConfigs":[{"actionName":"AttackAction","actionStartTime":0.5,"damageType":2,"valueAttribute":{"attributeType":0,"baseValue":60.0,"attributeFactor":0.6000000238418579,"roundFactor":0.0}}]},"from":{"instanceID":0},"to":{"instanceID":0},"status":0}

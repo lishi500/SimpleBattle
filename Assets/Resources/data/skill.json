@@ -1,0 +1,26 @@
+{
+  "attack": 5,
+  "skillActionConfigs":
+  [
+    {
+      "actionName": "attackAction",
+      "actionStartTime": 0.5,
+      "damageType": 2,
+      "valueAttribute": {
+        "attributeType": 0,
+        "baseValue": 50,
+        "attributeFactor": 0.5
+      }
+    },
+     {
+      "actionName": "attackAction",
+      "actionStartTime": 0.8,
+      "damageType": 2,
+      "valueAttribute": {
+        "attributeType": 1,
+        "baseValue": 50,
+        "attributeFactor": 0.5
+      }
+    }
+ ]
+}
