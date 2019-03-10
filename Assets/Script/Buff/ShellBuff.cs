@@ -47,4 +47,12 @@ public class ShellBuff : BaseBuff {
     public override void RoundEndExecute()
     {
     }
+
+    public override void PlayEffect()
+    {
+    }
+
+    public override void OnBuffCleared()
+    {
+    }
 }

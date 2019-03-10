@@ -11,6 +11,10 @@ public class ThornBuff : BaseBuff {
         buffName = "ThornBuff";
     }
 
+    public override void OnBuffCleared()
+    {
+    }
+
     public override void OnBuffEvaluated(Role from, Role to, ActionConfig config)
     {
         if (ActionUtils.Instance.ShouldTakeDamage(from, config.value1, ActionType.TRUE_DAMAGE)) {
@@ -19,6 +23,10 @@ public class ThornBuff : BaseBuff {
             StartCoroutine(action.Apply());
 
         }
+    }
+
+    public override void PlayEffect()
+    {
     }
 
     public override void RoundEndExecute()

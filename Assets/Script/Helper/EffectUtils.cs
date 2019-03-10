@@ -61,7 +61,22 @@ public class EffectUtils : MonoBehaviour {
         PlayParticle(healEffectObj);
     }
 
-
+    public void setEffectPosition(GameObject effectObj, Role from, Role to, EffectPositionType positionType) {
+        switch (positionType) {
+            case EffectPositionType.CENTOR:
+                break;
+            case EffectPositionType.SOURCE_POSITION:
+                effectObj.transform.position = from.transform.position;
+                break;
+            case EffectPositionType.TARGET_POSITION:
+                effectObj.transform.position = to.transform.position;
+                break;
+            case EffectPositionType.OTHER:
+                break;
+            default:
+                break;
+        }
+    }
 
     public void BloodDrippingEffect(Vector3 position, GameObject parentObj)
     {
@@ -69,8 +84,50 @@ public class EffectUtils : MonoBehaviour {
         bloodDrippingObj.GetComponent<BloodDrippingEffect>().PlayParticle();
     }
 
+
     public void CastAutoPlayEffect(Vector3 position, string path) {
         GameObject effectObj = PrafabUtils.Instance.create(path, position, null);
+    }
+
+    public LoopEffect initLoopEffect(string effectPath, float effectTime, float loopInterval) {
+        LoopEffect loopEffect = new LoopEffect();
+        loopEffect.effectName = effectPath;
+        loopEffect.effectTime = effectTime;
+        loopEffect.loopInterval = loopInterval;
+        loopEffect.waitingTime = loopEffect.loopInterval;
+
+        return loopEffect;
+    }
+
+    public LoopEffect initLoopEffect(string effectPath, float effectTime, float loopInterval, float offsetX, float offsetY)
+    {
+        LoopEffect loopEffect = initLoopEffect(effectPath, effectTime, loopInterval);
+        loopEffect.offsetX = offsetX;
+        loopEffect.offsetY = offsetY;
+
+        return loopEffect;
+    }
+
+    public GameObject createEffectByLoopEffect(LoopEffect loopEffect, Vector3 position) {
+        GameObject effectPrafab = PrafabUtils.Instance.create("effect/" + loopEffect.effectName);
+        position.x += loopEffect.offsetX;
+        position.y += loopEffect.offsetY;
+        effectPrafab.transform.position = position;
+
+        effectPrafab.AddComponent<CommonEffect>();
+        CommonEffect effect = effectPrafab.GetComponent<CommonEffect>();
+        effect.effectTime = loopEffect.effectTime;
+        loopEffect.effectObj = effectPrafab;
+
+        return effectPrafab;
+    }
+
+    public void loopEffectRePosition(LoopEffect loopEffect, Vector3 position) {
+        if (loopEffect.effectObj != null) {
+            position.x += loopEffect.offsetX;
+            position.y += loopEffect.offsetY;
+            loopEffect.effectObj.transform.position = position;
+        }
     }
 
     public void PlayParticle(GameObject effect) {

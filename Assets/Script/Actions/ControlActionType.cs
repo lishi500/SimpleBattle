@@ -7,5 +7,4 @@ public enum ControlActionType
    STONE,
    IMMU,
    CHAOS
-
 }

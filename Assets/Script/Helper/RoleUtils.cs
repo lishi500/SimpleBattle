@@ -6,6 +6,7 @@ using System;
 public class RoleUtils : MonoBehaviour {
     GameState gameState;
 
+    public RoleStatus[] controlStatus = new RoleStatus[] { RoleStatus.SLEEP, RoleStatus.STUN, RoleStatus.STONE };
    
     private static RoleUtils _instance;
     public static RoleUtils Instance { get { return _instance; } }
@@ -35,6 +36,72 @@ public class RoleUtils : MonoBehaviour {
     public bool IsPrimaryEnemy(Role role) {
         return role.GetComponent<Enemy>() != null && role.transform.tag == "Enemy" && role.GetComponent<Enemy>().type == RoleType.PrimaryEnemy;
 
+    }
+
+    public RoleStatus ConvertToRoleStatus(ControlActionType type) {
+        switch (type) {
+            case ControlActionType.CHAOS:
+                return RoleStatus.CHAOS;
+            case ControlActionType.IMMU:
+                return RoleStatus.IMMU;
+            case ControlActionType.SCLIENCE:
+                return RoleStatus.SCLIENCE;
+            case ControlActionType.SLEEP:
+                return RoleStatus.SLEEP;
+            case ControlActionType.STONE:
+                return RoleStatus.STONE;
+            case ControlActionType.STUN:
+                return RoleStatus.STUN;
+            default:
+                throw new Exception("can not find matching type of :" + type);
+        }
+        
+    } 
+
+    public void AddControlStatus(Role role, ControlActionType type) {
+        AddControlStatus(role, ConvertToRoleStatus(type));
+    }
+
+    public void AddControlStatus(Role role, RoleStatus status) {
+        if (Array.IndexOf(controlStatus, status) != -1) {
+            role.AddStatue(status);
+            role.RemoveStatus(RoleStatus.NORMAL);
+        }
+    }
+
+    public void RemoveControlStatus(Role role, RoleStatus status)
+    {
+        if (Array.IndexOf(controlStatus, status) != -1)
+        {
+            role.RemoveStatus(status);
+            if (!HasAnyStatus(role.status, controlStatus)) {
+                role.AddStatue(RoleStatus.NORMAL);
+            }
+        }
+    }
+
+    public bool HasAnyStatus(List<RoleStatus> status, RoleStatus[] statusList)
+    {
+        foreach (RoleStatus targetStatus in statusList)
+        {
+            if (status.Contains(targetStatus))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool HasAllStatus(List<RoleStatus> status, RoleStatus[] statusList)
+    {
+        foreach (RoleStatus targetStatus in statusList)
+        {
+            if (!status.Contains(targetStatus))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public float GetAttributeValueByType(Role role, AttributeType type) {

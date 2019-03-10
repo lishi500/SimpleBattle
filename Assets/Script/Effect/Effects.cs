@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Effects : MonoBehaviour {
+public abstract class Effects : MonoBehaviour {
     [SerializeField]
-    public float effectTime;
+    public float effectTime = -1;
+    public string effectName;
     public ParticleSystem particle;
 
     public virtual void PlayParticle() {
@@ -14,19 +15,16 @@ public class Effects : MonoBehaviour {
         }
     }
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public IEnumerator AutoDestory() {
+        if (effectTime > 0) {
+            yield return new WaitForSeconds(effectTime);
+            Destroy(this.gameObject);
+        }
+        yield return null;
+    }
 
-    public IEnumerator Free()
+    public void Free()
     {
-        yield return new WaitForSeconds(effectTime);
         Destroy(this.gameObject);
     }
 

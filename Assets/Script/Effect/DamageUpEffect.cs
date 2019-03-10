@@ -11,7 +11,7 @@ public class DamageUpEffect : Effects {
 
 
     void Start () {
-        StartCoroutine(Free());
+        StartCoroutine(AutoDestory());
     }
 
     public void SetDamage(float damage) {
@@ -51,12 +51,6 @@ public class DamageUpEffect : Effects {
         }
 
         transform.position = endPos;
-    }
-
-    IEnumerator Free()
-    {
-        yield return new WaitForSeconds(effectTime);
-        Destroy(this.gameObject);
     }
 
 }

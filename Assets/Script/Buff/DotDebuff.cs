@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class DotDebuff : BaseBuff {
 
-    private void Awake()
+
+    void Start()
     {
         isDeBuff = true;
         reactToType = new ActionType[] { ActionType.DISPEL };
@@ -38,5 +39,13 @@ public class DotDebuff : BaseBuff {
     public override void RoundEndExecute()
     {
 
+    }
+
+    public override void PlayEffect()
+    {
+    }
+
+    public override void OnBuffCleared()
+    {
     }
 }

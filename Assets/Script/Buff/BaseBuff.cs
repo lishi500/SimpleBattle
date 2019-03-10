@@ -13,6 +13,7 @@ abstract public  class BaseBuff : MonoBehaviour {
     public BuffType type;
     public int order;
     public Role caster;
+    public LoopEffect loopEffect;
 
     public float value1;
     public float value2;
@@ -52,21 +53,52 @@ abstract public  class BaseBuff : MonoBehaviour {
     public abstract void RoundStartExecute();
     public abstract void RoundEndExecute();
     public abstract void OnBuffEvaluated(Role from, Role to, ActionConfig config);
+    public abstract void PlayEffect();
+    public abstract void OnBuffCleared();
 
-    public void Awake()
+    public virtual void OnBuffApplied() {}
+
+
+    public void LateUpdate()
     {
-        
+        if (loopEffect != null) {
+            if (loopEffect.playing)
+            {
+                loopEffect.playTime += Time.deltaTime;
+                EffectUtils.Instance.loopEffectRePosition(loopEffect, GetRole().transform.position);
+                if (loopEffect.playTime > loopEffect.effectTime)
+                {
+                    loopEffect.playing = false;
+                    loopEffect.playTime = 0;
+                }
+            }
+            else
+            {
+                loopEffect.waitingTime += Time.deltaTime;
+                if (loopEffect.waitingTime > loopEffect.loopInterval)
+                {
+                    PlayEffect();
+
+                    loopEffect.waitingTime = 0;
+                    loopEffect.playing = true;
+                }
+            }
+        }
+
+
     }
 
+
+
     public virtual void RegisterFromAction(Action action, Role from) {
-        if (reactToFrom && isFrom(from) && this.reactToAction(action)) { 
+        if (reactToFrom && IsFrom(from) && this.ReactToAction(action)) { 
             action.notifyAction += OnBuffEvaluated;
         }
     }
 
     public virtual void RegisterToAction(Action action, Role to)
     {
-        if (!reactToFrom && isTo(to) && this.reactToAction(action))
+        if (!reactToFrom && IsTo(to) && this.ReactToAction(action))
         {
             action.notifyAction += OnBuffEvaluated;
         }
@@ -94,21 +126,21 @@ abstract public  class BaseBuff : MonoBehaviour {
         this.caster = caster;
     }
 
-    public bool reactToAction(Action action) {
+    public bool ReactToAction(Action action) {
         if (reactToAny) {
-            return containAnyType(action);
+            return ContainAnyType(action);
         } else {
-            return containAllType(action);
+            return ContainAllType(action);
         }
     }
 
-    public bool containAllType(Action action) {
+    public bool ContainAllType(Action action) {
         return action.hasActionTypes(reactToType);
     }
 
-    public bool containAnyType(Action action) {
-        foreach (ActionType type in reactToType) {
-            if (action.hasActionType(type)) {
+    public bool ContainAnyType(Action action) {
+        foreach (ActionType actionType in reactToType) {
+            if (action.hasActionType(actionType)) {
                 return true;
             }
         }
@@ -116,11 +148,11 @@ abstract public  class BaseBuff : MonoBehaviour {
         return false;
     }
 
-    public bool isFrom(Role from) {
+    public bool IsFrom(Role from) {
        return transform.parent.gameObject.GetInstanceID() == from.gameObject.GetInstanceID();
     }
 
-    public bool isTo(Role to) {
+    public bool IsTo(Role to) {
         return transform.parent.gameObject.GetInstanceID() == to.gameObject.GetInstanceID();
     }
 
@@ -128,7 +160,6 @@ abstract public  class BaseBuff : MonoBehaviour {
         return this.transform.parent.gameObject.GetComponent<Role>();
     }
 
-    public void OnBuffCleared() { }
 
     public virtual void Destory() {
 

@@ -13,7 +13,7 @@ public class BloodDrippingEffect : Effects
 
     // Use this for initialization
     void Start () {
-        StartCoroutine(Free());
+        StartCoroutine(AutoDestory());
     }
 	
 	// Update is called once per frame

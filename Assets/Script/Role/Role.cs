@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-abstract public class Role : MonoBehaviour {
+abstract public class Role : MonoBehaviour
+{
 
-    string name;
+    string roleName;
     int id;
 
     public int attack;
@@ -13,9 +14,9 @@ abstract public class Role : MonoBehaviour {
     public bool isAlive;
     public bool fristActionInRound = true;
     public bool roundFinished = false;
-    public RoleStatus status;
+    public List<RoleStatus> status;
     public RoleType type;
-    [SerializeField]  public List<GameObject> buffs;
+    [SerializeField] public List<GameObject> buffs;
 
     public Attribute attribute;
     [HideInInspector]
@@ -28,14 +29,15 @@ abstract public class Role : MonoBehaviour {
     private GameManager gameManager;
     private GameState gameState;
     public BasicAI AIController;
-    
+
 
     public delegate void RoleFirstActionEndDelegate();
     public event RoleFirstActionEndDelegate notifyRoleFirstActionEnd;
 
     public virtual void Awake()
     {
-        if (attribute == null) {
+        if (attribute == null)
+        {
             attribute = new Attribute();
         }
         healthBarObject = transform.Find("HealthBar").gameObject;
@@ -46,19 +48,29 @@ abstract public class Role : MonoBehaviour {
         gameManager = gameController.GetComponent<GameManager>();
         gameState = gameController.GetComponent<GameState>();
         actionsInRound = new List<Action>();
+        status = new List<RoleStatus>();
         //healthBar = FindObjectOfType<HealthBar>();
         //healthBar.SetHealth(50, 100);
+    }
+
+    public void LateUpdate()
+    {
+
     }
 
     public abstract void NextAction();
 
 
-    public List<BaseBuff> GetBuffs() {
+    public List<BaseBuff> GetBuffs()
+    {
         List<BaseBuff> baseBuffs = new List<BaseBuff>();
-        foreach (GameObject buffObj in buffs) {
-            if (buffObj != null) {
+        foreach (GameObject buffObj in buffs)
+        {
+            if (buffObj != null)
+            {
                 BaseBuff buff = buffObj.GetComponent<BaseBuff>();
-                if (buff != null) {
+                if (buff != null)
+                {
                     baseBuffs.Add(buff);
                 }
             }
@@ -67,21 +79,26 @@ abstract public class Role : MonoBehaviour {
         return baseBuffs;
     }
 
-    public void AddBuff(GameObject buffPrafab, Role caster) {
+
+    public void AddBuff(GameObject buffPrafab, Role caster)
+    {
         bool exist = false;
         BaseBuff buff = buffPrafab.GetComponent<BaseBuff>();
         Vector3 scale = buffPrafab.transform.localScale;
         buff.fromRoleId = caster.GetInstanceID();
         buff.SetCaster(caster);
-        foreach (BaseBuff baseBuff in GetBuffs()) {
-            if (baseBuff.buffName == buff.buffName && baseBuff.fromRoleId == caster.GetInstanceID()) {
+        foreach (BaseBuff baseBuff in GetBuffs())
+        {
+            if (baseBuff.buffName == buff.buffName && baseBuff.fromRoleId == caster.GetInstanceID())
+            {
                 buff.order = baseBuff.order;
                 exist = true;
                 ReplaceBuff(baseBuff, buffPrafab);
             }
         }
 
-        if (!exist) {
+        if (!exist)
+        {
             buffPrafab.transform.SetParent(this.transform);
             buffPrafab.transform.position = this.transform.position;
             buff.order = buffs.Count;
@@ -91,24 +108,29 @@ abstract public class Role : MonoBehaviour {
         buffPrafab.transform.localScale = scale;
     }
 
-    public void RoleActionEnd(Action action) {
+    public void RoleActionEnd(Action action)
+    {
         actionsInRound.Add(action);
 
-        if (fristActionInRound) {
+        if (fristActionInRound)
+        {
             fristActionInRound = false;
-            if (notifyRoleFirstActionEnd != null) {
+            if (notifyRoleFirstActionEnd != null)
+            {
                 notifyRoleFirstActionEnd();
             }
         }
     }
 
-    public void RoleControlEnd() {
+    public void RoleControlEnd()
+    {
         actionsInRound.Clear();
         roundFinished = true;
         gameManager.RoleControlFinished(this);
     }
 
-    public void RoleControlStart() {
+    public void RoleControlStart()
+    {
         roundFinished = false;
         fristActionInRound = true;
     }
@@ -130,13 +152,16 @@ abstract public class Role : MonoBehaviour {
         Destroy(oldBuff);
     }
 
-    public float GetAttributeValue(AttributeType type) {
+    public float GetAttributeValue(AttributeType type)
+    {
         return RoleUtils.Instance.GetAttributeValueByType(this, type);
     }
 
 
-    public float ReduceHealth(float amount) {
-        if (attribute.shield > 0) {
+    public float ReduceHealth(float amount)
+    {
+        if (attribute.shield > 0)
+        {
             float amountLeft = Mathf.Max(amount - attribute.shield, 0);
             ReduceShield(amount);
 
@@ -153,26 +178,32 @@ abstract public class Role : MonoBehaviour {
         return attribute.HP;
     }
 
-    public float AddHealth(float amount) {
-        if (isAlive) {
+    public float AddHealth(float amount)
+    {
+        if (isAlive)
+        {
             attribute.HP = Mathf.Min(attribute.HP + amount, attribute.maxHP);
         }
 
         return attribute.HP;
     }
 
-    public float ReduceShield(float amount) {
+    public float ReduceShield(float amount)
+    {
         attribute.shield -= amount;
-        if (attribute.shield <= 0) {
+        if (attribute.shield <= 0)
+        {
             attribute.shield = 0;
         }
 
         return attribute.shield;
     }
 
-    public void SetAlive(bool alive) {
+    public void SetAlive(bool alive)
+    {
         this.isAlive = alive;
-        if (!isAlive) {
+        if (!isAlive)
+        {
 
             Action lastAction = gameState.GetLastAction();
             Role murder = lastAction == null ? this : lastAction.from;
@@ -181,30 +212,56 @@ abstract public class Role : MonoBehaviour {
 
             StartCoroutine(action.Apply());
         }
-    } 
+    }
 
-    public int getId() {
+    public int getId()
+    {
         return this.GetInstanceID();
     }
 
-    public void UpdateHealth() {
+    public void UpdateHealth()
+    {
         healthBar.SetHealth(attribute.HP, attribute.maxHP, attribute.shield);
     }
 
-    public void SetAi(BasicAI ai) {
+    public void SetAi(BasicAI ai)
+    {
         this.AIController = ai;
     }
 
-    public bool CanMove() {
-        return (status != RoleStatus.SLEEP && status != RoleStatus.STONE && status != RoleStatus.STUN);
+    public bool CanControl()
+    {
+        return !RoleUtils.Instance.HasAnyStatus(status, new RoleStatus[] { RoleStatus.SLEEP, RoleStatus.STONE, RoleStatus.STUN});
     }
 
-    public bool isSilenced() {
-        return status == RoleStatus.SCLIENCE;
+    public bool CanCastSkill()
+    {
+        return !RoleUtils.Instance.HasAnyStatus(status, new RoleStatus[] { RoleStatus.SCLIENCE });
+
     }
 
-    public bool CanBeHeal() {
-        return isAlive && status != RoleStatus.IMMU;
+    public bool CanBeHeal()
+    {
+        return isAlive && !RoleUtils.Instance.HasAnyStatus(status, (new RoleStatus[] { RoleStatus.IMMU }));
     }
+
+
+
+    public void AddStatue(RoleStatus roleStatus)
+    {
+        if (!status.Contains(roleStatus))
+        {
+            status.Add(roleStatus);
+        }
+    }
+
+    public void RemoveStatus(RoleStatus roleStatus) {
+        if (status.Contains(roleStatus))
+        {
+            status.Remove(roleStatus);
+        }
+
+    }
+
 
 }

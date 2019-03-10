@@ -30,5 +30,12 @@ public class DoubleDamageBuff : BaseBuff {
     public override void RoundEndExecute()
     {
     }
-   
+
+    public override void PlayEffect()
+    {
+    }
+
+    public override void OnBuffCleared()
+    {
+    }
 }

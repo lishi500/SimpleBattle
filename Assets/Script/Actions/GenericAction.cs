@@ -24,8 +24,20 @@ public class GenericAction : Action
         }
         else if (hasActionType(ActionType.CONTROL))
         {
-
+            yield return StartCoroutine(ControlAction());
         }
+
+        yield return null;
+    }
+
+    private IEnumerator ControlAction()
+    {
+        RegisterActionToBuff();
+        broadCastEvent();
+
+        switch (config.controlActionType) {
+            case ControlActionType.STUN:
+        }        
 
         yield return null;
     }
